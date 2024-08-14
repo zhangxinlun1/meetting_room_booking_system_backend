@@ -24,3 +24,45 @@ export class RegisterUserDto {
   })
   captcha: string;
 }
+
+export class LoginUserDto {
+  @IsNotEmpty({
+    message: '用户名不能为空',
+  })
+  username: string;
+
+  @IsNotEmpty({
+    message: '密码不能为空',
+  })
+  password: string;
+}
+interface UserInfo {
+  id: number;
+
+  username: string;
+
+  nickName: string;
+
+  email: string;
+
+  headPic: string;
+
+  phoneNumber: string;
+
+  isFrozen: boolean;
+
+  isAdmin: boolean;
+
+  createTime: any;
+
+  roles: string[];
+
+  permissions: string[];
+}
+export class LoginUserVo {
+  userInfo: UserInfo;
+
+  accessToken: string;
+
+  refreshToken: string;
+}
