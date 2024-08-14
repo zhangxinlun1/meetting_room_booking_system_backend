@@ -17,7 +17,7 @@ export class EmailService {
   async sendEmail({ to, subject, html }) {
     await this.transporter.sendMail({
       from: {
-        name: '会议室预定系统',
+        name: '每日一爱',
         address: '19244743@qq.com',
       },
       to,
