@@ -12,8 +12,8 @@ export class Role {
   id: number;
 
   @Column({
-    length: 20,
-    comment: '角色名',
+    length: 50,
+    comment: '名字',
   })
   name: string;
 

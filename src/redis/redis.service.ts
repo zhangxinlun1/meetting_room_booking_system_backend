@@ -7,13 +7,20 @@ export class RedisService {
   private redisClient: RedisClientType;
 
   async get(key: string) {
+    if (!key) return;
     return await this.redisClient.get(key);
   }
 
   async set(key: string, value: string, ttl?: number): Promise<void> {
-    await this.redisClient.set(key, value);
+    const data = await this.redisClient.set(key, value);
+    console.log(key, value, data);
     if (ttl) {
-      await this.redisClient.expire(key, ttl);
+      const data = await this.redisClient.expire(key, ttl);
+      console.log(key, ttl, data);
     }
+  }
+
+  async del(key: string) {
+    await this.redisClient.del(key);
   }
 }

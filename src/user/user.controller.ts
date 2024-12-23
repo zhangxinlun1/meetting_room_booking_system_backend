@@ -1,24 +1,26 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
   Inject,
-  Req,
+  Post,
   Query,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { LoginUserDto, RegisterUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  emailAdress,
+  LoginUserDto,
+  RegisterUserDto,
+} from './dto/create-user.dto';
 import { EmailService } from '../email/email.service';
 import { RedisService } from '../redis/redis.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreateEmailDto } from '../email/dto/create-email.dto';
 
+@ApiTags('用户管理')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -33,8 +35,9 @@ export class UserController {
 
   @Inject(RedisService)
   private redisService: RedisService;
+  @ApiOperation({ summary: '给老婆发邮件' })
   @Get('register-captcha')
-  async captcha(@Query('address') address: string) {
+  async captcha(@Query('address') address: emailAdress) {
     const code = Math.random().toString().slice(2, 8);
 
     await this.redisService.set(`captcha_${address}`, code, 5 * 60);
@@ -46,19 +49,25 @@ export class UserController {
     });
     return '发送成功';
   }
-
+  @ApiOperation({ summary: '用户注册' })
   @Post('register')
-  register(@Body() registerUser: RegisterUserDto) {
-    console.log(registerUser);
+  async register(@Body() registerUser: RegisterUserDto) {
+    console.log(registerUser, 'create User');
+    const captcha = await this.emailService.validateVerificationCode(
+      registerUser.email,
+      registerUser.captcha,
+    );
+    console.log({ captcha });
+    if (!captcha) return false;
     return this.userService.register(registerUser);
   }
-
+  @ApiOperation({ summary: '初始化一些用户' })
   @Get('init-data')
   async initData() {
     await this.userService.initData();
     return 'done';
   }
-
+  @ApiOperation({ summary: 'token刷新' })
   @Get('refresh')
   async refresh(@Query('refreshToken') refreshToken: string) {
     try {
@@ -93,8 +102,9 @@ export class UserController {
     }
   }
 
+  @ApiOperation({ summary: 'admin的token刷新' })
   @Get('admin/refresh')
-  async radminRefresh(@Query('refreshToken') refreshToken: string) {
+  async adminRefresh(@Query('refreshToken') refreshToken: string) {
     try {
       const data = this.jwtService.verify(refreshToken);
 
@@ -126,12 +136,18 @@ export class UserController {
       throw new UnauthorizedException('token 已失效,请重新登录');
     }
   }
+  @ApiOperation({ summary: '用户登录' })
   @Post('login')
   async userLogin(@Body() loginUser: LoginUserDto) {
     console.log(loginUser);
     return await this.userService.login(loginUser, false);
   }
-
+  @ApiOperation({ summary: '用户邮箱发送验证码' })
+  @Post('captcha')
+  async userEmailCaptcha(@Body() CreateEmailDto: CreateEmailDto) {
+    return await this.emailService.sendVerificationCode(CreateEmailDto);
+  }
+  @ApiOperation({ summary: 'admin用户登录' })
   @Post('admin/login')
   async adminLogin(@Body() loginUser: LoginUserDto) {
     console.log(loginUser);

@@ -10,6 +10,9 @@ import { RedisModule } from './redis/redis.module';
 import { EmailModule } from './email/email.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { RoleModule } from './role/role.module';
+import { DataSource } from 'typeorm';
+import { PremissionModule } from './premission/premission.module';
 
 @Module({
   imports: [
@@ -33,16 +36,14 @@ import { JwtModule } from '@nestjs/jwt';
           'meeting_room_booking_system',
         ),
         synchronize: true,
-        logging: true,
+        logging: false,
         poolSize: 10,
         timezone: '+08:00',
         autoLoadEntities: true,
         connectorPackage: 'mysql2',
-        extra: {
-          authPlugin: 'sha256_password',
-        },
       }),
     }),
+
     RedisModule,
     EmailModule,
     JwtModule.registerAsync({
@@ -57,6 +58,8 @@ import { JwtModule } from '@nestjs/jwt';
       },
       inject: [ConfigService],
     }),
+    RoleModule,
+    PremissionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

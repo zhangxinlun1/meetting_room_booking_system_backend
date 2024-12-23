@@ -10,17 +10,16 @@ import {
   LoginUserVo,
   RegisterUserDto,
 } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { RedisClientType } from 'redis';
 import { RedisService } from '../redis/redis.service';
 import { md5 } from '../utils';
 import { Role } from './entities/role.entity';
 import { Permission } from './entities/permission.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { RoleService } from '../role/role.service';
 
 @Injectable()
 export class UserService {
@@ -36,21 +35,12 @@ export class UserService {
   @Inject(RedisService)
   private redis: RedisService;
 
+  @Inject(RoleService)
+  private roleService: RoleService;
   @Inject(ConfigService)
   private configService: ConfigService;
-
   @Inject(JwtService) private jwtService: JwtService;
   async register(user: RegisterUserDto) {
-    const captcha = await this.redis.get(`captcha_${user.email}`);
-    console.log({ captcha });
-    if (!captcha) {
-      throw new HttpException('验证码失效', HttpStatus.BAD_REQUEST);
-    }
-
-    if (captcha != user.captcha) {
-      throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST);
-    }
-
     const foundUser = await this.userRepository.findOneBy({
       username: user.username,
     });
@@ -63,6 +53,11 @@ export class UserService {
     newUser.email = user.email;
     newUser.password = md5(user.password);
     newUser.nickName = user.nickName;
+    const lowestAdminRole = await this.roleService.findLowAdmin();
+    if (!lowestAdminRole) {
+      throw new Error('最低级管理员角色不存在');
+    }
+    newUser.roles = [lowestAdminRole];
     try {
       await this.userRepository.save(newUser);
       return '注册成功';
