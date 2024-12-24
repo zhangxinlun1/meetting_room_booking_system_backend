@@ -19,6 +19,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateEmailDto } from '../email/dto/create-email.dto';
+import { WeatherService } from '../weather/weather.service';
 
 @ApiTags('用户管理')
 @Controller('user')
@@ -35,19 +36,36 @@ export class UserController {
 
   @Inject(RedisService)
   private redisService: RedisService;
+
+  @Inject(WeatherService)
+  private weatherService: WeatherService;
   @ApiOperation({ summary: '给老婆发邮件' })
   @Get('register-captcha')
   async captcha(@Query('address') address: emailAdress) {
-    const code = Math.random().toString().slice(2, 8);
-
-    await this.redisService.set(`captcha_${address}`, code, 5 * 60);
-
-    await this.emailService.sendEmail({
-      to: address,
-      subject: '张鑫伦的爱',
-      html: `<h1>我爱郑文莉</h1>`,
-    });
-    return '发送成功';
+    try {
+      const weatherData = await this.weatherService.getWeatherByName();
+      const code = Math.random().toString().slice(2, 8);
+      await this.redisService.set(`captcha_${address}`, code, 5 * 60);
+      const moment = require('moment');
+      const formattedDate = moment(weatherData.updateTime).format(
+        'YYYY-MM-DD HH:mm:ss',
+      );
+      console.log(formattedDate);
+      await this.emailService.sendEmail({
+        to: address,
+        subject: '张鑫伦的爱',
+        html: `<h1>我爱郑文莉</h1>
+        <h4>天气更新时间为${formattedDate}</h4>
+        <p>天气状态为:${weatherData.now.text}</p>
+        <p>当前温度是:${weatherData.now.temp}°</p>
+        <p>体感温度:${weatherData.now.feelsLike}°</p>
+        <p>降水量:${weatherData.now.precip}</p>
+        <p>云量:${weatherData.now.cloud}</p>`,
+      });
+      return '发送成功';
+    } catch (err) {
+      throw new Error(err);
+    }
   }
   @ApiOperation({ summary: '用户注册' })
   @Post('register')

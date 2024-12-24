@@ -13,10 +13,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { RoleModule } from './role/role.module';
 import { DataSource } from 'typeorm';
 import { PremissionModule } from './premission/premission.module';
+import { WeatherModule } from './weather/weather.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TasksService } from './utils/Task';
 
 @Module({
   imports: [
     UserModule,
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: 'src/.env',
@@ -60,8 +64,9 @@ import { PremissionModule } from './premission/premission.module';
     }),
     RoleModule,
     PremissionModule,
+    WeatherModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, TasksService],
 })
 export class AppModule {}
