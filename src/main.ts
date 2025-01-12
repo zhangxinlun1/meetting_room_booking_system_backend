@@ -2,10 +2,19 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ScheduleModule } from '@nestjs/schedule';
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
+import * as dotenv from 'dotenv';
 async function bootstrap() {
+  dotenv.config();
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
+  const corsOptions: CorsOptions = {
+    origin: ['http://localhost:5173'], // 允许前端所在的端口（5173）的请求跨域访问后端
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: false, // 根据实际情况决定是否需要跨域携带Cookie等凭证，如果不需要设为false
+  };
+  app.enableCors(corsOptions);
   const config = new DocumentBuilder()
     .setTitle('My API') // 设置文档标题
     .setDescription('The API description') // 设置文档描述

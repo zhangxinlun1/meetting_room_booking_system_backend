@@ -16,9 +16,14 @@ import { PremissionModule } from './premission/premission.module';
 import { WeatherModule } from './weather/weather.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksService } from './utils/Task';
+import { FileUploadModule } from './file-upload/file-upload.module';
+import { fileUploadConfig } from './file-upload/file-upload.config';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
+    MulterModule.register(fileUploadConfig),
+    FileUploadModule,
     UserModule,
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
