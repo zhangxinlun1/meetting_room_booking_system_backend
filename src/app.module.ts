@@ -19,9 +19,13 @@ import { TasksService } from './utils/Task';
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { fileUploadConfig } from './file-upload/file-upload.config';
 import { MulterModule } from '@nestjs/platform-express';
-
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public/uploaded'),
+    }),
     MulterModule.register(fileUploadConfig),
     FileUploadModule,
     UserModule,
@@ -52,7 +56,6 @@ import { MulterModule } from '@nestjs/platform-express';
         connectorPackage: 'mysql2',
       }),
     }),
-
     RedisModule,
     EmailModule,
     JwtModule.registerAsync({
@@ -69,7 +72,7 @@ import { MulterModule } from '@nestjs/platform-express';
     }),
     RoleModule,
     PremissionModule,
-    WeatherModule,
+    // WeatherModule,
   ],
   controllers: [AppController],
   providers: [AppService, TasksService],

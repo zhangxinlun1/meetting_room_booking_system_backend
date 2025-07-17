@@ -10,7 +10,7 @@ import {
 import { FilesService } from './file-upload.service';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Express } from 'express';
-import { FileInterceptor } from './file.interceptor';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Files')
 @Controller('files')
@@ -29,7 +29,7 @@ export class FilesController {
       },
     },
   })
-  @UseInterceptors(FileInterceptor)
+  @UseInterceptors(FileInterceptor('file'))
   @Post('upload')
   @ApiConsumes('multipart/form-data')
   async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<any> {
