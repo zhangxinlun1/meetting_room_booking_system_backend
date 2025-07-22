@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { FilesService } from './file-upload.service';
+import { FilesLocalService } from './file-upload-local.service';
 import { FilesController } from './file-upload.controller';
 import { fileUploadConfig } from './file-upload.config';
 import { MulterModule } from '@nestjs/platform-express';
@@ -13,20 +14,11 @@ import { diskStorage } from 'multer';
 @Module({
   imports: [
     MulterModule.register({
-      // 用于配置上传，这部分也可以写在路由上
-      storage: diskStorage({
-        // destination: join(__dirname, '../images'),
-        destination: join('./public/uploaded'),
-        filename: (_, file, callback) => {
-          const fileName = `${
-            new Date().getTime() + extname(file.originalname)
-          }`;
-          return callback(null, fileName);
-        },
-      }),
+      // 使用内存存储，这样文件会以buffer形式传递
+      storage: undefined,
     }),
   ],
   controllers: [FilesController],
-  providers: [FilesService, FileInterceptor],
+  providers: [FilesService, FilesLocalService, FileInterceptor],
 })
 export class FileUploadModule {}

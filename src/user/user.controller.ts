@@ -14,7 +14,7 @@ import {
   RegisterUserDto,
 } from './dto/create-user.dto';
 import { EmailService } from '../email/email.service';
-import { RedisService } from '../redis/redis.service';
+
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -34,8 +34,7 @@ export class UserController {
   @Inject(ConfigService)
   private configService: ConfigService;
 
-  @Inject(RedisService)
-  private redisService: RedisService;
+
 
   @Inject(WeatherService)
   private weatherService: WeatherService;
@@ -45,7 +44,7 @@ export class UserController {
     try {
       const weatherData = await this.weatherService.getWeatherByName();
       const code = Math.random().toString().slice(2, 8);
-      await this.redisService.set(`captcha_${address}`, code, 5 * 60);
+      // Redis service removed
       const moment = require('moment');
       const formattedDate = moment(weatherData.updateTime).format(
         'YYYY-MM-DD HH:mm:ss',

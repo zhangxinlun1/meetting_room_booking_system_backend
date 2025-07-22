@@ -13,7 +13,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { RedisService } from '../redis/redis.service';
+
 import { md5 } from '../utils';
 import { Role } from './entities/role.entity';
 import { Permission } from './entities/permission.entity';
@@ -32,8 +32,7 @@ export class UserService {
 
   @InjectRepository(Permission)
   private permissionRepository: Repository<Permission>;
-  @Inject(RedisService)
-  private redis: RedisService;
+
 
   @Inject(RoleService)
   private roleService: RoleService;

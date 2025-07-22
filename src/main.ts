@@ -4,12 +4,20 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import * as dotenv from 'dotenv';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 async function bootstrap() {
   dotenv.config();
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  
+  // 配置静态文件服务
+  app.useStaticAssets(join(__dirname, '..', 'public'), {
+    prefix: '/uploaded/',
+    index: false, // 禁用默认的index.html
+  });
   app.useGlobalPipes(new ValidationPipe());
   const corsOptions: CorsOptions = {
-    origin: ['http://localhost:5173'], // 允许前端所在的端口（5173）的请求跨域访问后端
+    origin: true, // 允许所有来源，或者使用 ['http://localhost:5173', /^http:\/\/192\.168\.\d+\.\d+:5173$/]
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: false, // 根据实际情况决定是否需要跨域携带Cookie等凭证，如果不需要设为false

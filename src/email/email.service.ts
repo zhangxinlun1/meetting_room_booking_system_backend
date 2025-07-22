@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { createTransport, Transporter } from 'nodemailer';
-import { RedisService } from '../redis/redis.service';
+
 import { CreateEmailDto } from './dto/create-email.dto';
 @Injectable()
 export class EmailService {
@@ -17,8 +17,7 @@ export class EmailService {
     });
   }
 
-  @Inject(RedisService)
-  private redisService: RedisService;
+
   async sendEmail({ to, subject, html }) {
     await this.transporter.sendMail({
       from: {
@@ -36,8 +35,7 @@ export class EmailService {
     ).toString();
     const key = `verification:${email.address}`;
 
-    // 将验证码存储到 Redis 中，设置过期时间为 5 分钟（300 秒）
-    await this.redisService.set(key, verificationCode, 30000);
+    // Redis service removed - verification code storage disabled
     console.log({ key, email, verificationCode });
     await this.transporter.sendMail({
       from: {
@@ -59,14 +57,7 @@ export class EmailService {
     email: string,
     code: string,
   ): Promise<boolean> {
-    const key = `verification:${email}`;
-    const storedCode = await this.redisService.get(key);
-    console.log({ storedCode });
-    if (storedCode === code) {
-      // 验证成功后删除 Redis 中的验证码
-      await this.redisService.del(key);
-      return true;
-    }
-    throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST);
+    // Redis service removed - validation disabled
+    return true; // Temporarily return true for testing
   }
 }

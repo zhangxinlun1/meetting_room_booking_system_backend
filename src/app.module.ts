@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Permission } from './user/entities/permission.entity';
 import { Role } from './user/entities/role.entity';
 import { User } from './user/entities/user.entity';
-import { RedisModule } from './redis/redis.module';
+
 import { EmailModule } from './email/email.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -56,7 +56,6 @@ import { join } from 'path';
         connectorPackage: 'mysql2',
       }),
     }),
-    RedisModule,
     EmailModule,
     JwtModule.registerAsync({
       global: true,
