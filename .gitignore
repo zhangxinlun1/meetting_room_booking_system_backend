@@ -1,2 +1,59 @@
+# 构建输出
 dist
 node_modules
+
+# 环境变量文件
+.env
+.env.local
+.env.production
+.env.development
+
+# 日志文件
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 运行时数据
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# 覆盖率目录
+coverage
+.nyc_output
+
+# 依赖目录
+node_modules/
+jspm_packages/
+
+# 可选的npm缓存目录
+.npm
+
+# 可选的eslint缓存
+.eslintcache
+
+# 微服务架构的日志
+lerna-debug.log*
+
+# 操作系统生成的文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE文件
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# 上传文件
+uploads/
+public/uploads/
