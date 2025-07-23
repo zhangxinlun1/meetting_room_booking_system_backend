@@ -24,6 +24,7 @@ export class OrderService {
       const orderItems = createOrderDto.items.map(item => ({
         ...item,
         orderId: savedOrder.id,
+        subtotal: item.price * item.quantity, // 计算小计
       }));
       await this.orderItemRepository.save(orderItems);
     }

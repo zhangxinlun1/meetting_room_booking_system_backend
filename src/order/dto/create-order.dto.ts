@@ -1,9 +1,11 @@
 export class CreateOrderItemDto {
   productId: number;
+  productName: string;
+  productCode: string;
   quantity: number;
   price: number;
   costPrice: number;
-  totalPrice: number;
+  subtotal: number;
   profit: number;
 }
 

@@ -2,7 +2,7 @@ export class CreateProductDto {
   name: string;
   code: string;
   category: string;
-  price: number;
+  salePrice: number;
   costPrice: number;
   stock: number;
   unit: string;
