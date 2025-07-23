@@ -6,11 +6,8 @@ WORKDIR /app
 # 复制依赖配置
 COPY package.json yarn.lock ./
 
-# 安装 yarn（确保可用）
-RUN npm install -g yarn --registry=https://registry.npm.taobao.org
-
 # 安装依赖
-RUN yarn install --registry=https://registry.npm.taobao.org
+RUN yarn install --registry=https://registry.npmjs.org
 
 # 复制所有代码
 COPY . .
@@ -25,8 +22,7 @@ WORKDIR /app
 
 # 复制依赖配置（仅安装生产依赖）
 COPY package.json yarn.lock ./
-RUN npm install -g yarn --registry=https://registry.npm.taobao.org
-RUN yarn install --production --registry=https://registry.npm.taobao.org
+RUN yarn install --production --registry=https://registry.npmjs.org
 
 # 复制构建产物
 COPY --from=build /app/dist ./dist

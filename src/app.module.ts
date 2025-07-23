@@ -2,10 +2,19 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
+import { ProductModule } from './product/product.module';
+import { OrderModule } from './order/order.module';
+import { StockModule } from './stock/stock.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Permission } from './user/entities/permission.entity';
 import { Role } from './user/entities/role.entity';
 import { User } from './user/entities/user.entity';
+import { Product } from './product/entities/product.entity';
+import { Order } from './order/entities/order.entity';
+import { OrderItem } from './order/entities/order-item.entity';
+import { StockIn } from './stock/entities/stock-in.entity';
+import { StockInItem } from './stock/entities/stock-in-item.entity';
+import { StockAdjustment } from './stock/entities/stock-adjustment.entity';
 
 import { EmailModule } from './email/email.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -24,11 +33,15 @@ import { join } from 'path';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public/uploaded'),
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/uploaded',
     }),
     MulterModule.register(fileUploadConfig),
     FileUploadModule,
     UserModule,
+    ProductModule,
+    OrderModule,
+    StockModule,
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
@@ -39,14 +52,14 @@ import { join } from 'path';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'mysql',
-        entities: [User, Permission, Role],
+        entities: [User, Permission, Role, Product, Order, OrderItem, StockIn, StockInItem, StockAdjustment],
         host: configService.get('DB_HOST', 'localhost'),
         port: configService.get('DB_PORT', 3306),
         username: configService.get('DB_USERNAME', 'root'),
         password: configService.get('DB_PASSWORD', 'woaini520.'),
         database: configService.get(
           'DB_DATABASE',
-          'meeting_room_booking_system',
+          'apparel_admin_db',
         ),
         synchronize: true,
         logging: false,
@@ -54,6 +67,9 @@ import { join } from 'path';
         timezone: '+08:00',
         autoLoadEntities: true,
         connectorPackage: 'mysql2',
+        retryAttempts: 3,
+        retryDelay: 3000,
+        keepConnectionAlive: true,
       }),
     }),
     EmailModule,
