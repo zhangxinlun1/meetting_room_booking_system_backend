@@ -45,20 +45,20 @@ export class OrderService {
     if (startDate && endDate) {
       whereCondition.createTime = Between(new Date(startDate), new Date(endDate));
     }
-
+    console.log(whereCondition);
     return this.orderRepository.find({
       where: whereCondition,
       skip,
       take: limit,
       order: { createTime: 'DESC' },
-      relations: ['items'],
+      // relations: ['items'],
     });
   }
 
   findOne(id: number) {
     return this.orderRepository.findOne({ 
       where: { id },
-      relations: ['items'],
+      // relations: ['items'],
     });
   }
 
@@ -115,5 +115,17 @@ export class OrderService {
       totalRevenue,
       totalProfit,
     };
+  }
+
+  // 简单的数据库连接测试方法
+  async testConnection() {
+    try {
+      const result = await this.orderRepository.find({
+        take: 1
+      });
+      return { success: true, count: result.length };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
   }
 } 

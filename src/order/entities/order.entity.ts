@@ -4,7 +4,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { OrderItem } from './order-item.entity';
 
 @Entity({ name: 'orders' })
 export class Order {
@@ -62,6 +64,9 @@ export class Order {
     nullable: true,
   })
   remark: string;
+
+  @OneToMany(() => OrderItem, orderItem => orderItem.order)
+  items: OrderItem[];
 
   @CreateDateColumn()
   createTime: Date;
